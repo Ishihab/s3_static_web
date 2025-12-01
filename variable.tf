@@ -1,22 +1,4 @@
 
-# Remote Backend Configuration Variables
-variable "remote_backend_bucket" {
-  description = "The name of the S3 bucket to store the remote state"
-  type        = string
-}
-
-
-variable "remote_backend_region" {
-  description = "The AWS region where the S3 bucket is located"
-  type        = string
-}
-
-variable "remote_backend_dynamodb_table" {
-  description = "The DynamoDB table used for state locking"
-  type        = string
-}
-
-
 # AWS Provider Configuration Variables
 variable "aws_region" {
   description = "The AWS region to deploy resources in"
