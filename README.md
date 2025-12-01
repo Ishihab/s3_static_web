@@ -15,24 +15,18 @@ The infrastructure includes:
 - [Terraform](https://www.terraform.io/downloads.html) (v1.0+)
 - AWS Account with appropriate permissions
 - AWS CLI configured with credentials
-- An existing S3 bucket for Terraform remote state (optional, for team collaboration)
+- An existing S3 bucket for Terraform remote state storage
 
 ## 🚀 Quick Start
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ishihab/s3_static_web.git
 cd s3_static_website
 ```
 
-### 2. Configure Backend (Optional)
-
-If you want to use remote state storage, copy and configure the backend file:
-
-```bash
-cp backend.tf.sample backend.tf
-```
+### 2. Configure Backend
 
 Edit `backend.tf` with your remote state configuration:
 
@@ -48,7 +42,7 @@ terraform {
 }
 ```
 
-> **Note**: `backend.tf` is gitignored to prevent committing sensitive backend configurations. For local development without remote state, skip this step.
+> **Note**: Update the `bucket`, `region`, and `profile` values to match your AWS environment.
 
 ### 3. Configure Variables
 
@@ -70,12 +64,6 @@ aws_profile = "your-aws-profile-name"
 terraform init
 ```
 
-If migrating from local to remote state or vice versa, use:
-
-```bash
-terraform init -migrate-state
-```
-
 ### 5. Review the Plan
 
 ```bash
@@ -94,8 +82,7 @@ Type `yes` when prompted to confirm the deployment.
 
 ```
 .
-├── backend.tf.sample             # Sample remote state backend configuration
-├── backend.tf                    # Your backend config (gitignored)
+├── backend.tf                    # Remote state backend configuration
 ├── cloudfront.tf                 # CloudFront CDN distribution
 ├── providers.tf                  # AWS provider configuration
 ├── s3.tf                         # S3 bucket and website configuration
@@ -158,8 +145,8 @@ Supported file types are automatically detected:
 - S3 bucket public access configured for website hosting
 - Bucket policy allows public read access to objects
 - CloudFront uses HTTPS for secure content delivery
-- State file can be stored securely in S3 (when using remote backend)
-- Sensitive files (`backend.tf`, `terraform.tfvars`) are gitignored
+- State file stored securely in S3 remote backend
+- Sensitive configuration (`terraform.tfvars`) is gitignored
 
 ## 🗑️ Cleanup
 
@@ -177,8 +164,8 @@ Type `yes` when prompted to confirm resource deletion.
 - CloudFront distribution deployment may take 15-20 minutes
 - Website files are automatically uploaded from the `www/` directory
 - Content-Type headers are automatically set based on file extensions
-- `backend.tf` is gitignored - each developer/environment should configure their own backend
-- For local development, you can work without a remote backend (local state file)
+- Before using this project, update `backend.tf` with your own S3 bucket and AWS profile
+- The backend configuration is committed to the repository for consistency
 
 ## 🤝 Contributing
 
@@ -194,8 +181,8 @@ See [LICENSE](LICENSE) file for details.
 
 ## ⚠️ Important Reminders
 
-- Never commit `terraform.tfvars` or `backend.tf` with sensitive credentials (they are gitignored)
-- Create your own `backend.tf` from `backend.tf.sample` if using remote state
+- **Update `backend.tf`** with your own S3 bucket for remote state before running `terraform init`
+- Never commit `terraform.tfvars` with sensitive credentials (it is gitignored)
 - Ensure your AWS credentials have sufficient permissions
 - CloudFront distributions incur charges even when idle
 - Review AWS pricing before deployment
@@ -204,9 +191,9 @@ See [LICENSE](LICENSE) file for details.
 
 ### Issue: Terraform init fails with backend errors
 **Solution**: 
-- If using remote backend: Verify your S3 bucket exists and is accessible
-- If migrating state: Use `terraform init -migrate-state`
-- If working locally: Remove or don't create `backend.tf`
+- Verify the S3 bucket specified in `backend.tf` exists and is accessible
+- Ensure your AWS profile has permissions to access the S3 bucket
+- Check that the profile name in `backend.tf` matches your AWS CLI configuration
 
 ### Issue: Access denied errors
 **Solution**: Check your AWS profile permissions and ensure the IAM user has required policies for S3, CloudFront, and IAM operations.
