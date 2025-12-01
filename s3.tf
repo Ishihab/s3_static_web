@@ -1,15 +1,14 @@
 resource "aws_s3_bucket" "static_website_bucket" {
-    bucket_prefix = "my-static-website-"
-    tags = {
-      Name        = "My Static Website Bucket"
-      Environment = "Dev"
-    } 
+    bucket_prefix = var.bucket_prefix
+    region = var.bucket_region
+    tags = var.tags
 }
+
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
     bucket = aws_s3_bucket.static_website_bucket.id
     versioning_configuration {
-      status = "Enabled"
+      status = var.aws_s3_bucket_versioning
     }
 }
 
@@ -37,7 +36,7 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
     bucket = aws_s3_bucket.static_website_bucket.id
-
+    depends_on = [ aws_s3_bucket_public_access_block.public_access ]
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [

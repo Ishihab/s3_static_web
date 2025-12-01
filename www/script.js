@@ -1,6 +1,6 @@
 const apiKey = "7112f7605bf604a2298ba251c4014431"; 
 const apiUrl = "https://api.openweathermap.org/data/3.0/onecall?";
-const locationApiUrl = "http://api.openweathermap.org/geo/1.0/direct?";
+const locationApiUrl = "https://api.openweathermap.org/geo/1.0/direct?";
 
 const locationInput = document.getElementById("locationInput");
 const searchButton = document.getElementById("searchButton");
