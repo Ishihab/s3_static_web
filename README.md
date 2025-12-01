@@ -7,7 +7,7 @@ This Terraform project provisions a fully functional static website hosted on AW
 The infrastructure includes:
 - **S3 Bucket**: Hosts static website files with public read access
 - **CloudFront Distribution**: CDN for faster global content delivery
-- **Remote State Backend**: S3 backend with DynamoDB state locking
+- **Remote State Backend**: S3 backend for remote state storage
 - **Versioning**: S3 bucket versioning enabled by default
 
 ## 📋 Prerequisites
@@ -15,8 +15,7 @@ The infrastructure includes:
 - [Terraform](https://www.terraform.io/downloads.html) (v1.0+)
 - AWS Account with appropriate permissions
 - AWS CLI configured with credentials
-- An existing S3 bucket for Terraform remote state
-- A DynamoDB table for state locking
+- An existing S3 bucket for Terraform remote state (optional, for team collaboration)
 
 ## 🚀 Quick Start
 
@@ -27,7 +26,31 @@ git clone <repository-url>
 cd s3_static_website
 ```
 
-### 2. Configure Variables
+### 2. Configure Backend (Optional)
+
+If you want to use remote state storage, copy and configure the backend file:
+
+```bash
+cp backend.tf.sample backend.tf
+```
+
+Edit `backend.tf` with your remote state configuration:
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "your-terraform-state-bucket"
+    key    = "s3_static_web/terraform.tfstate"
+    region = "us-east-1"
+    profile = "your-aws-profile"
+    use_lockfile = true
+  }
+}
+```
+
+> **Note**: `backend.tf` is gitignored to prevent committing sensitive backend configurations. For local development without remote state, skip this step.
+
+### 3. Configure Variables
 
 Copy the sample tfvars file and update with your values:
 
@@ -35,28 +58,31 @@ Copy the sample tfvars file and update with your values:
 cp terraform.tfvars.sample terraform.tfvars
 ```
 
-Edit `terraform.tfvars` with your configuration:
+Edit `terraform.tfvars` with your AWS profile:
 
 ```hcl
 aws_profile = "your-aws-profile-name"
-remote_backend_bucket = "your-terraform-state-bucket"
-remote_backend_region = "us-east-1"
-remote_backend_dynamodb_table = "your-dynamodb-table-name"
 ```
 
-### 3. Initialize Terraform
+### 4. Initialize Terraform
 
 ```bash
 terraform init
 ```
 
-### 4. Review the Plan
+If migrating from local to remote state or vice versa, use:
+
+```bash
+terraform init -migrate-state
+```
+
+### 5. Review the Plan
 
 ```bash
 terraform plan
 ```
 
-### 5. Deploy the Infrastructure
+### 6. Deploy the Infrastructure
 
 ```bash
 terraform apply
@@ -68,13 +94,14 @@ Type `yes` when prompted to confirm the deployment.
 
 ```
 .
-├── backend.tf                    # Remote state backend configuration
+├── backend.tf.sample             # Sample remote state backend configuration
+├── backend.tf                    # Your backend config (gitignored)
 ├── cloudfront.tf                 # CloudFront CDN distribution
 ├── providers.tf                  # AWS provider configuration
 ├── s3.tf                         # S3 bucket and website configuration
 ├── variable.tf                   # Variable definitions
 ├── terraform.tfvars.sample       # Sample variables file
-├── terraform.tfvars              # Your local configuration (not tracked)
+├── terraform.tfvars              # Your local configuration (gitignored)
 └── www/                          # Website content directory
     ├── index.html                # Homepage
     ├── error.html                # Error page
@@ -89,9 +116,6 @@ Type `yes` when prompted to confirm the deployment.
 | Variable | Description |
 |----------|-------------|
 | `aws_profile` | AWS CLI profile name for authentication |
-| `remote_backend_bucket` | S3 bucket name for storing Terraform state |
-| `remote_backend_region` | AWS region for the state bucket |
-| `remote_backend_dynamodb_table` | DynamoDB table for state locking |
 
 ### Optional Variables
 
@@ -134,7 +158,8 @@ Supported file types are automatically detected:
 - S3 bucket public access configured for website hosting
 - Bucket policy allows public read access to objects
 - CloudFront uses HTTPS for secure content delivery
-- State file stored securely in S3 with DynamoDB locking
+- State file can be stored securely in S3 (when using remote backend)
+- Sensitive files (`backend.tf`, `terraform.tfvars`) are gitignored
 
 ## 🗑️ Cleanup
 
@@ -152,6 +177,8 @@ Type `yes` when prompted to confirm resource deletion.
 - CloudFront distribution deployment may take 15-20 minutes
 - Website files are automatically uploaded from the `www/` directory
 - Content-Type headers are automatically set based on file extensions
+- `backend.tf` is gitignored - each developer/environment should configure their own backend
+- For local development, you can work without a remote backend (local state file)
 
 ## 🤝 Contributing
 
@@ -167,18 +194,22 @@ See [LICENSE](LICENSE) file for details.
 
 ## ⚠️ Important Reminders
 
-- Never commit `terraform.tfvars` with sensitive credentials
+- Never commit `terraform.tfvars` or `backend.tf` with sensitive credentials (they are gitignored)
+- Create your own `backend.tf` from `backend.tf.sample` if using remote state
 - Ensure your AWS credentials have sufficient permissions
 - CloudFront distributions incur charges even when idle
 - Review AWS pricing before deployment
 
 ## 🆘 Troubleshooting
 
-### Issue: Terraform init fails
-**Solution**: Verify your remote backend S3 bucket and DynamoDB table exist and are accessible.
+### Issue: Terraform init fails with backend errors
+**Solution**: 
+- If using remote backend: Verify your S3 bucket exists and is accessible
+- If migrating state: Use `terraform init -migrate-state`
+- If working locally: Remove or don't create `backend.tf`
 
 ### Issue: Access denied errors
-**Solution**: Check your AWS profile permissions and ensure the IAM user has required policies.
+**Solution**: Check your AWS profile permissions and ensure the IAM user has required policies for S3, CloudFront, and IAM operations.
 
 ### Issue: CloudFront not serving content
 **Solution**: Wait 15-20 minutes for distribution deployment to complete. Check CloudFront console for status.
