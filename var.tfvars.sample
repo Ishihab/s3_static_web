@@ -1,0 +1,10 @@
+aws_profile = "aws_profile_name" # provide your aws profile name here
+remote_backend_bucket = "s3-bucket-name-for-remote-state" # provide the s3 bucket name that will store the remote state
+remote_backend_region = "s3-bucket-region" # provide the region where the s3 bucket is created
+remote_backend_dynamodb_table = "dynamodb-table-name" # provide the dynamodb table name for state locking
+#aws_region = "aws-region" # provide the aws region to deploy resources
+#aws_s3_bucket_versioning = "Enabled" # set to "Enabled" to enable versioning for the s3 bucket or "Suspended" to disable versioning
+#tags = {# Add your tags here as key-value pairs }
+#bucket_prefix = "your-bucket-prefix" # provide a prefix to be used for the s3 bucket name
+#bucket_region = "bucket-region" # provide the region where the s3 bucket for the website will be created
+
