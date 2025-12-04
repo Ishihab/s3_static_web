@@ -6,12 +6,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "aws_profile" {
-  description = "The AWS CLI profile to use for authentication (leave empty to use environment variables)"
-  type        = string
-  default     = ""
-}
-
 # s3 bucket configuration variables
 variable "aws_s3_bucket_versioning" {
   description = "Enable versioning for the S3 bucket"
