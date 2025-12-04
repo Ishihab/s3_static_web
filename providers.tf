@@ -1,5 +1,4 @@
 provider "aws" {
   region = var.aws_region
-  # Uses environment variables: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 }
 
