@@ -7,9 +7,9 @@ variable "aws_region" {
 }
 
 variable "aws_profile" {
-  description = "The AWS CLI profile to use for authentication"
+  description = "The AWS CLI profile to use for authentication (leave empty to use environment variables)"
   type        = string
-  default     = "terraform_dockyard"
+  default     = ""
 }
 
 # s3 bucket configuration variables
