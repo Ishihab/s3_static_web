@@ -32,7 +32,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
       {
         Sid       = "PublicReadGetObject"
         Effect    = "Allow"
-        Principal = "*"
+        Principal = "${aws_cloudfront_distribution.cdn_distribution.arn}"
         Action    = "s3:GetObject"
         Resource  = "${aws_s3_bucket.static_website_bucket.arn}/*"
       }
